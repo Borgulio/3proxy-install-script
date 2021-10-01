@@ -105,6 +105,7 @@ echo 'allow *' >> /etc/3proxy/3proxy.cfg
 echo 'maxconn 64' >> /etc/3proxy/3proxy.cfg
 echo "socks -p$PORTSOCKS" >> /etc/3proxy/3proxy.cfg
 
+systemctl daemon-reload
 /usr/bin/killall 3proxy
 systemctl start 3proxy
 systemctl enable 3proxy
