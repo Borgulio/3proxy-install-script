@@ -47,10 +47,9 @@ yum upgrade -y
 yum install wget zip unzip -y
 yum -y install gcc
 cd /tmp/
-#wget https://github.com/3proxy/3proxy/archive/refs/tags/0.9.4.tar.gz
-wget https://github.com/z3APA3A/3proxy/archive/0.9.3.tar.gz
-tar -xvzf 0.9.3.tar.gz
-cd 3proxy-0.9.3
+wget https://github.com/3proxy/3proxy/archive/refs/tags/0.9.4.tar.gz
+tar -xvzf 0.9.4.tar.gz
+cd 3proxy-0.9.4
 make -f Makefile.Linux
 #mkdir -p /opt/3proxy/bin
 mkdir /etc/3proxy
@@ -67,6 +66,8 @@ Description=3proxy Proxy Server
 [Service]
 Type=simple
 ExecStart=/usr/bin/3proxy /etc/3proxy/3proxy.cfg
+RemainAfterExit=yes
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target' > /etc/systemd/system/3proxy.service
