@@ -10,14 +10,12 @@ if [[ "$EUID" -ne 0 ]]; then
 fi
 
 
-
 # Пробуем получить наш IP адрес
+yum install wget -y
 IP=$(wget -4qO- "http://whatismyip.akamai.com/")
 
 
 clear
-echo 'Начинаем установку 3proxy вместе с SecFAll.com'
-echo ""
 # Установка 3proxy
 echo "Несколько вопросов перед началом установки"
 echo "Вы можете оставлять параметры по умолчанию и просто нажимать «Enter», если они вас устраивают."
@@ -25,6 +23,7 @@ echo "Если хотите изменить параметр, то сотрит
 echo ""
 echo "Для начала введите IP адрес, на который 3proxy будет принимать подкючения"
 echo "Если автоматически определённый IP адрес правильный, просто нажмите Enter"
+echo "Если ничего не работает попробуйте 0.0.0.0"
 read -p "Определён IP адрес: " -e -i $IP IP
 echo ""
 echo "На какой порт будем принимать подключения HTTP(S) (1080 рекомендуется)?"
@@ -44,21 +43,17 @@ read -n1 -r -p "Нажмите любую кнопку для продолжен
 yum install epel-release -y
 yum update -y
 yum upgrade -y
-yum install wget zip unzip -y
-yum -y install gcc
+yum install zip unzip -y
+yum install gcc -y
 cd /tmp/
 wget https://github.com/3proxy/3proxy/archive/refs/tags/0.9.4.tar.gz
 tar -xvzf 0.9.4.tar.gz
 cd 3proxy-0.9.4
 make -f Makefile.Linux
-#mkdir -p /opt/3proxy/bin
 mkdir /etc/3proxy
-#touch /opt/3proxy/3proxy.pid
-#touch /etc/3proxy/3proxy.pid
-#cp ./src/3proxy /opt/3proxy/bin
 cp bin/3proxy /usr/bin/
-#cp ./cfg/3proxy.cfg.sample /opt/3proxy/3proxy.cfg
 touch /etc/3proxy/3proxy.cfg
+
 #Делаем скрипт управления службой 3proxy
 echo '[Unit]
 Description=3proxy Proxy Server
@@ -87,7 +82,7 @@ echo 'log /dev/null' >> /etc/3proxy/3proxy.cfg
 echo '' >> /etc/3proxy/3proxy.cfg
 
 echo "external $IP" >> /etc/3proxy/3proxy.cfg
-echo "" >> /etc/3proxy/3proxy.cfg
+echo '' >> /etc/3proxy/3proxy.cfg
 
 echo '#HTTP(S)' >> /etc/3proxy/3proxy.cfg
 echo 'auth strong' >> /etc/3proxy/3proxy.cfg
@@ -96,7 +91,7 @@ echo 'allow *' >> /etc/3proxy/3proxy.cfg
 echo 'maxconn 64' >> /etc/3proxy/3proxy.cfg
 echo "proxy -n -p$PORTHTTP" >> /etc/3proxy/3proxy.cfg
 
-echo "" >> /etc/3proxy/3proxy.cfg
+echo '' >> /etc/3proxy/3proxy.cfg
 
 echo '#SOCKS5' >> /etc/3proxy/3proxy.cfg
 echo 'auth strong' >> /etc/3proxy/3proxy.cfg
@@ -105,6 +100,7 @@ echo 'allow *' >> /etc/3proxy/3proxy.cfg
 echo 'maxconn 64' >> /etc/3proxy/3proxy.cfg
 echo "socks -p$PORTSOCKS" >> /etc/3proxy/3proxy.cfg
 
+#Запускаем
 systemctl daemon-reload
 /usr/bin/killall 3proxy
 systemctl start 3proxy
@@ -112,5 +108,3 @@ systemctl enable 3proxy
 
 echo "3proxy установлен и запущен"
 read -n1 -r -p "Нажмите любую кнопку для продолжения..."
-
-
